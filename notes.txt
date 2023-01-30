@@ -64,11 +64,23 @@ eg
 
 
 Bash
+- ipsweep
+- for ip in $(cat ip.txt); do nmap $ip; done
 
-for ip in $(cat ip.txt); do nmap $ip; done
+
+
+Stages
+- Recon(active and passive)
+- Scanning and enum(nmap,nessus,nikto)
+- Gain access(exploitation)
+- Maintain access
+- Covering tracks(clean up logs,malwares,redo settings,accounts)
 
 
 
+
+
+#Info Gathering(Passive)
 
 
 
