@@ -107,12 +107,16 @@ OSINT
 
 #Scanning and enum
 kioptrix(vulnhub) john TwoCows2
-       -arpscan -l
-       -netdiscover
-       3 way handshake      SYN SYNACK ACK
-                            SYN SYNACK RST (nmap -sS)
-
-
+       - arpscan -l
+       - netdiscover
+       3 way handshake   - SYN SYNACK ACK
+                         - SYN SYNACK RST (nmap -sS)
+       - nikto
+       - dirb, dirbuster, gobuster, feroxbuster
+SMB - 139,445(port TCP/UDP 137 for name services, and port UDP 138 for datagram services)
+       - msf
+       - smbclient -L \\\\ip\\
+SSH    - ssh ip -oKexAlgorithms=+</algo> -c aes128-cbc
 
 
 
