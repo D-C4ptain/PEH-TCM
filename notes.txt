@@ -78,14 +78,39 @@ Stages
 
 
 
-
-
 #Info Gathering(Passive)
+location
+employees
+web/host - target validation(lookup,dnsrecon)
+         - subdomains(bluto,google fu,dig,nmap,sublist3r,crt.sh)
+         - fingerprinting(nmap,wapalizer,builtwith,whatweb,netcat)
+         - data beaches(haveibeenpawned,breachparse,weleakinfo)
+emails - hunter.io
+       - phonebook.cz
+       - tools.verifyemailaddress.io
+       - email-checker.net
+Creds  - breachparse.sh @domain.com domain.txt
+       - dehashed(subscribe,login) (mk@domain.com mk1234, @domain.com)
+       - hashes.com
+subdomains - apt install sublist3r/owasp amass
+           - crt.sh - certificate fingerprinting(%.domain.com)
+           - tomnomnomm httpprobe(liveness of sub)
+websites - builtwith.com
+         - wappalizer
+         - whatweb
+         - burp
+         - google fu(dorks)
+social media
+OSINT
 
 
 
-
-
+#Scanning and enum
+kioptrix(vulnhub) john TwoCows2
+       -arpscan -l
+       -netdiscover
+       3 way handshake      SYN SYNACK ACK
+                            SYN SYNACK RST (nmap -sS)
 
 
 
