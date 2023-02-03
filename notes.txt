@@ -136,9 +136,6 @@ Payloads - Staged - sends payload in stages
          - Non-staged - sends shellcode payload at once
                       - large and might fail
                       - windows/meterpreter_reverse_tcp
-NOTE
---***Automate https://github.com/heltonWernik/OpenLuck***--
-
 credential stuffing - inject breached acc creds for acc takeover
 password spraying - using known usernames against unknown passwd
        if on AD careful on acc lock out.

@@ -1,3 +1,9 @@
+#!/usr/bin/python
+
+__author__ = "D_captain"
+__credits__ = ["Heath Adams"]
+
+
 import sys
 import socket
 from datetime import datetime as dt
