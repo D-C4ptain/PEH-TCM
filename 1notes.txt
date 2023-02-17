@@ -63,6 +63,9 @@ eg
 
 
 
+git clone pimpmykali
+
+
 Bash
 - ipsweep
 - for ip in $(cat ip.txt); do nmap $ip; done
@@ -335,6 +338,45 @@ Cleanup - remove executables, scripts, added files
         - rm malware, rootkits, added users
         - revoke settings to original
         - clear logs
+
+
+
+#Web application enumeration
+Finding subdomains
+       Assetfinder
+              go get -u github.com/tomnomnom/assetfinder
+              go install github.com/tomnomnom/assetfinder@latest
+              apt install assetfinder
+              assetfinder --subs-only tes.com
+       Amass
+              https://github.com/OWASP/Amass
+              export GO111MODULE=on
+              go install -v github.com/OWASP/Amass/v3/...@master
+              sudo snap install amass
+              export PATH=$PATH:/snap/bin
+              Periodically, execute the following command to update all your snap packages:
+              sudo snap refresh
+              apt-get update
+              apt-get install amass
+              amass enum -d tes.com
+       alive domains with Httprobe
+              ▶ go install github.com/tomnomnom/httprobe@latest
+              cat tesla.com/recon/final.txt | httprobe -s -p https:443 | sed 's/https\?:\/\///' | tr -d ':443'
+screenshoting with Gowitness
+       go get -u gorm.io/gorm
+       If you have your Golang binary path in your $PATH, use go get -u github.com/sensepost/gowitness.
+       Use go install github.com/sensepost/gowitness@latest if you have Golang 1.17+
+       gowitness single https://tesla.com
+Automating enum
+       https://github.com/Gr1mmie/sumrecon
+       https://pastebin.com/MhE6zXVt
+Hunting
+       https://www.youtube.com/watch?v=uKWu6yhnhbQ
+       https://www.youtube.com/watch?v=MIujSpuDtFY&list=PLKAaMVNxvLmAkqBkzFaOxqs3L66z2n8LA
+
+
+
+#OWASP top 10
 
 
 
