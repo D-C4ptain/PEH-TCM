@@ -377,10 +377,23 @@ Hunting
 
 
 #OWASP top 10
+https://owasp.org/www-pdf-archive/OWASP_Top_10-2017_%28en%29.pdf.pdf
+https://github.com/tanprathan/OWASP-Testing-Checklist
+https://owasp.org/www-project-web-security-testing-guide/assets/archive/OWASP_Testing_Guide_v4.pdf
+https://medium.com/@airman604/installing-docker-in-kali-linux-2017-1-fbaa4d1447fe
+https://github.com/juice-shop/juice-shop
+https://pwning.owasp-juice.shop/
+
+https://github.com/WebGoat/WebGoat
+docker run -it -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 -e TZ=Europe/Amsterdam webgoat/webgoat
+If you want to reuse the container, give it a name:
+docker run --name webgoat -it -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 -e TZ=Europe/Amsterdam webgoat/webgoat
+As long as you don't remove the container you can use:
+docker start webgoat
 
 
-
-
+docker pull bkimminich/juice-shop
+docker run --rm -p 3000:3000 bkimminich/juice-shop
 
 
 
