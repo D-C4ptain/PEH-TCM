@@ -383,6 +383,8 @@ https://owasp.org/www-project-web-security-testing-guide/assets/archive/OWASP_Te
 https://medium.com/@airman604/installing-docker-in-kali-linux-2017-1-fbaa4d1447fe
 https://github.com/juice-shop/juice-shop
 https://pwning.owasp-juice.shop/
+docker pull bkimminich/juice-shop
+docker run --rm -p 3000:3000 bkimminich/juice-shop
 
 https://github.com/WebGoat/WebGoat
 docker run -it -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 -e TZ=Europe/Amsterdam webgoat/webgoat
@@ -391,15 +393,86 @@ docker run --name webgoat -it -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 -e T
 As long as you don't remove the container you can use:
 docker start webgoat
 
+1. SQL injection
+       ' " string delimiters
+       -- /* # comment delimiters
+       * % wildcards
+       : terminator
+       = + > < () programmatic logic
+2. Broken auth
+       auto attacks(brute, cred stuffing)
+       default,weak creds
+       weak creds recovery, forgot password
+       plaintext,unencrypted weak hashes
+       missing multifactor auth
+       exposing sess ids in url
+       No rotation of sess ids after login(session fixation)
+       does not properly invalidate sess ids, auth tokens
+3. Sensitive data exposure
+       passwords,cc numbers,health records,business secrets,PII,PCI
+       http,smtp,ftp transmission
+       weak crypto algos
+       default,weak,reused crypto keys,improper key management, no rotation
+       browser headers missing(https strict transport security,csp,referer....)
+              securityheaders.com
+       verify server certificate
+              nmap --script=ssl-enum-ciphers -p 443 tesla.com
+4. XML externa entities(XXE)
+       attack sys that parse xml input
+       abuse sys entity and get malicious
+       attacks include
+              dos,local file disclosure, rce....
+5. Broken access control - user access where they shouldn't
+       modify url,internal app state,custom api
+       primary key changed to another users's record(IDOR)
+       elevation of privileges(acts as user/admin)
+       metadata manipulation(jw tokens,cookies, invalidation)
+       CORS misconfiguration
+       force browsing to authenticated pages
+6. security misconfiguration
+       missing security hardening
+       misconfigured permissions
+       unnecessary features(ports,services,pages,account,privileges)
+       default accs and passwords
+       overinformative error handling
+       insecure security feature configuration
+       insecure values in headers from server
+       vulnerable outdated software
+7. XSS - Unsanitized input (https://xss-game.appspot.com/)
+       reflected - app includes unvalidated input as html output
+       stored - stored in server(critical)
+       DOM - Doc object model- js frameworks,singlepage apps and APIs dynamically include attacker controllled data to page.
+       prevention
+              encoding(special chars)
+              filtering(strip out chars)
+              validating(whitelisting input)
+              sanitization(combination of encoding,validation and filters)
+8. Insecure deserialization(ysoserial)
+       serialization - convert obj to send thru network(in xml js,binary)
+       serialization is used for
+              remote and interprocess comm(RPC/IPC)
+              wire protocols,web services,msg brokers
+              caching/persistence
+              databases,cache servers,file systems
+              http cookies,html form params,api auth tokens
+       serialize an exploit and the app deserializes and executes it
+       attacker modifies app logic or achieves rce if there are classes that can change behaviour during/after deserialization
+9. Components with know vulns
+       vulnerable softwares,libraries - wappalizer, scanners
+       easy to find exploits
+10. Insufficient logging and monitoring
+       Auditable events, such as logins, failed logins, and high-value transactions are not logged.
+       Warnings and errors generate no, inadequate, or unclear log messages.
+       Logs of applications and APIs are not monitored for suspicious activity.
+       Logs are only stored locally.
+       Appropriate alerting thresholds and response escalation processes are not in place or effective.
+       Penetration testing and scans by DAST tools (such as OWASP ZAP) do not trigger alerts.
+       The application is unable to detect, escalate, or alert for active attacks in real time or near real time.
+       You are vulnerable to information leakage if you make logging and alerting events visible to a user or an attacker
 
-docker pull bkimminich/juice-shop
-docker run --rm -p 3000:3000 bkimminich/juice-shop
 
-
-
-
-
-
+#Wireless penetration testing
+       
 
 
 
