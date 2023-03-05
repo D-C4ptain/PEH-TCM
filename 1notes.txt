@@ -1,5 +1,8 @@
 PEH - TCM
 
+https://tcm-sec.com/
+https://academy.tcm-sec.com/p/practical-ethical-hacking-the-complete-course
+
 recs - https://github.com/Gr1mmie/Practical-Ethical-Hacking-Resources
 
 
@@ -318,7 +321,7 @@ Initial attack vectors
 https://medium.com/@adam.toscher/top-five-ways-i-got-domain-admin-on-your-internal-network-before-lunch-2018-edition-82259ab73aaa
 
 LLMNR Poisoning
-linked local multicast name resolution(formerly NBT-NS)
+link-local multicast name resolution(formerly NBT-NS)
 identify hosts when dns fails
 responds with user's username and NTLMv2 hash
 python3 /usr/share/responder/Responder.py -I wlo1 -rdwv(run in morning/afterlunch, when ppl are starting traffic/services)/ responder -I wlo1 -rdwv
@@ -839,10 +842,15 @@ process:
 
 
 #Legal documents and report writing
+sales
+       Mutual non-disclosure agreement(NDA)
+       Master service agreement(MSA)
+       Statement of work(SOW)
+       others: sample report, recommendation
+Before testing
+       Rules of engangement(ROE)
+After testing
+       Findings report
 
-
-
-
-
-
-
+pentest report writing      
+https://github.com/hmaverickadams/TCM-Security-Sample-Pentest-Report
